@@ -58,13 +58,13 @@ const template = [
             {
                 label : "Clear",
                 click : function() {
-                    mainWindow.webContents.executeJavaScript( "window.TMON.MEMO.clearMemo()" );
+                    mainWindow.webContents.executeJavaScript( "window.SIMPLE_MEMO.MEMO.clearMemo()" );
                 },
                 accelerator: process.platform === "darwin" ? "Alt+Command+Control+C" : "Ctrl+Shift+I"
             }, {
                 label : "Sort",
                 click : function() {
-                    mainWindow.webContents.executeJavaScript( "window.TMON.MEMO.sortMemo()" );
+                    mainWindow.webContents.executeJavaScript( "window.SIMPLE_MEMO.MEMO.sortMemo()" );
                 },
                 accelerator : process.platform === "darwin" ? "Alt+Command+Control+S" : "Ctrl+Shift+I"
             }, {
@@ -78,6 +78,6 @@ const template = [
         ]
     }
 ];
-   
+
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);

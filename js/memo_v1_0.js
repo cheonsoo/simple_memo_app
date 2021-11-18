@@ -1,9 +1,9 @@
-var TMON = TMON || {}; // Namespace 등록
+var SIMPLE_MEMO = SIMPLE_MEMO || {}; // Namespace 등록
 
 // IIFE 를 통한 캡슐화 및 공개 함수 등록
-TMON.MEMO = (() => {
+SIMPLE_MEMO.MEMO = (() => {
 
-    let id_local_storage = "tmon_memo_stack_key";
+    let id_local_storage = "simple_memo_stack_key";
     let color_set = [ "#2E86C1", "#EC7063", "#F9E79F", "#ABEBC6", "#E5E7E9" ]; // 랜덤 색상 및 색상 선택 목록
     let container = "container";
     let el_container; // 메모가 생성되는 최상단 Container Element
@@ -18,20 +18,20 @@ TMON.MEMO = (() => {
     /**
      * localStorage 에서 등록된 메모를 불러와 화면에 출력
      * 저장된 메모가 없을 경우 하나 생성
-     * 
+     *
      * @Parameters
      * opt = {
      *  container : ID_OF_CONTAINER_ELEMENTS,
-     *  buttons : Boolean, 
-     *  random_color : Boolean 
+     *  buttons : Boolean,
+     *  random_color : Boolean
      * }
      */
     function init( opt ) {
 
         console.log( `### Initialize Memo` );
-        
+
         if ( opt && opt.container ) {
-            
+
             // debugger;
             container = opt.container;
             el_container = document.querySelector( `#${container}` );
@@ -54,7 +54,7 @@ TMON.MEMO = (() => {
         }
 
         let memo_stack = getMemoStack();
-        
+
         if ( memo_stack && memo_stack.length > 0 ) {
             memo_stack.forEach( memo => {
                 createAMemo( memo );
@@ -89,7 +89,7 @@ TMON.MEMO = (() => {
 
         // Hide Other Container
         document.querySelectorAll( ".wrap" ).forEach( el => el.style.display = "none" );
-        
+
         document.querySelector( `body` ).appendChild( memo_container );
         el_container = memo_container;
     }
@@ -116,7 +116,7 @@ TMON.MEMO = (() => {
             btn_sort.type = "button";
             btn_sort.value = "SORT";
             btn_sort.addEventListener( "click", sortMemo );
-        
+
         button_container.appendChild( btn_clear );
         button_container.appendChild( btn_sort );
         el_container.appendChild( button_container );
@@ -126,8 +126,8 @@ TMON.MEMO = (() => {
      * 메모의 디폴트 정보를 리턴
      */
     function getMemoInfoDefault() {
-        let memo_info = { 
-            idx : 1, 
+        let memo_info = {
+            idx : 1,
             id : "memo_1",
             text : "### First Memo ###",
             style : {
@@ -186,9 +186,9 @@ TMON.MEMO = (() => {
         document.querySelectorAll( ".memo" ).forEach( memo => memo_stack.push( getMemoInfo( memo ) ));
         localStorage.setItem( id_local_storage, JSON.stringify( memo_stack ) );
     }
-    
+
     /**
-     * 
+     *
      */
    function getMemoTemplate( memo_info ) {
 
@@ -246,7 +246,7 @@ TMON.MEMO = (() => {
             content_textarea.spellcheck = false;
             content_textarea.addEventListener( "keyup", evt => saveContents( evt ) );
             content_textarea.addEventListener( "click", evt => getFocused( evt.target.parentElement.parentElement.id ) );
-            
+
             // Memo 의 textarea 부분 설정
             content_textarea.innerText = memo_info.text;
             content_textarea.style.width = memo_info.style.width + "px";
@@ -255,7 +255,7 @@ TMON.MEMO = (() => {
         // Make A Memo
         content.appendChild( content_textarea );
 
-        
+
 
         memo.appendChild( header );
         memo.appendChild( content );
@@ -284,17 +284,17 @@ TMON.MEMO = (() => {
         memo.style.left = `${memo_info.style.pos_x}px`;
         memo.style.zIndex = `${memo_info.style.z_index}`;
         memo.style.background = `${memo_info.style.background}`;
-        
+
         // Memo 의 textarea 부분 설정
         let text_area = memo.querySelector( "#text_area" );
             text_area.innerText = memo_info.text;
             text_area.style.width = memo_info.style.width + "px";
             text_area.style.height = memo_info.style.height + "px";
-        
+
         // 메모를 추가할 최상단 Div 에 메모를 추가
         el_container.appendChild( memo );
     }
-    
+
     /**
      * 마우스의 드래그 전 위치를 가져온다.
      * 마우스 드래그 이벤트는 메모 내 모든 영영에 걸려있기 때문에 메모가 마우스가 이동한 거리만큼만 이동하기 위함.
@@ -304,14 +304,14 @@ TMON.MEMO = (() => {
         prev_x = evt.clientX;
         prev_y = evt.clientY;
     }
-    
+
     /**
      * 드래그 시 다른 Event 와의 중첩을 방지
      */
     function allowDrop( evt ) {
         evt.preventDefault();
     }
-    
+
     /**
      * drap 시 마우스의 시작포인터를 가져오고 선택된 메모를 가져옴
      */
@@ -319,44 +319,44 @@ TMON.MEMO = (() => {
         getStartPoint( evt );
         evt.dataTransfer.setData( "text/plain", evt.target.id );
     }
-    
+
     /**
      * 드래그 후 마우스 버튼을 해제했을 때의 동작
      */
     function drop( evt ) {
-        
+
         evt.preventDefault();
 
         let data = evt.dataTransfer.getData( "text/plain" );
             evt.dataTransfer.dropEffect = "move"
         let memo = document.getElementById( data );
-        
+
         let current_x = parseInt( memo.style.left );
         let current_y = parseInt( memo.style.top );
         let pos_x = evt.clientX;
         let pos_y = evt.clientY;
-        
+
         // 메모의 최종 위치
         let move_x = current_x + ( pos_x - prev_x );
         let move_y = current_y + ( pos_y - prev_y );
-    
+
         memo.style.top =  move_y + "px";
         memo.style.left = move_x + "px";
-        
+
         // 메모를 최상단으로 가져온다.
         getFocused( data );
     }
-    
+
     /**
      * 새로운 메모를 생성한다. Container 의 회색 바탕화면을 클릭했을 때 호출
      */
     function newMemo( evt ) {
-        
-        // Container 이외의 부분을 클릭했을 때는 return 
+
+        // Container 이외의 부분을 클릭했을 때는 return
         if ( evt.target.id != container ) {
             return false;
         }
-    
+
         let memo_stack = getMemoStack();
 
         // 메모의 최대 생성 Validation
@@ -365,11 +365,11 @@ TMON.MEMO = (() => {
             alert( msg );
             return false;
         }
-        
+
         // 마지막으로 생성된 메모의 정보
         let last_memo = memo_stack[ memo_stack.length - 1 ];
         let id = last_memo ? last_memo.idx + 1 : 0;
-        
+
         let memo_info = {
             idx : last_memo ? last_memo.idx + 1 : 1,
             id : id,
@@ -383,7 +383,7 @@ TMON.MEMO = (() => {
                 background : ""
             }
         };
-        
+
         // Options 에서 random_color 의 값이 true 일 경우 메모를 생성할 때 color_set 에 있는 값을 랜덤으로 설정
         if ( random_color ) {
             let color_rand_idx = parseInt( Math.random() * 5 );
@@ -394,10 +394,10 @@ TMON.MEMO = (() => {
 
         let memo = getMemoTemplate( memo_info );
         el_container.appendChild( memo );
-        
+
         saveStatus();
     }
-    
+
     var delay = (function() {
         var timer = 0;
         return function( callback, ms ) {
@@ -405,7 +405,7 @@ TMON.MEMO = (() => {
             timer = setTimeout( callback, ms );
         };
     })();
-    
+
     /**
      * 메모의 onkeyup 이벤트 발생 시 사용자가 입력을 중단할때 까지 기다린 후 상태값을 저장
      * 함수가 호출 될 때마다 timeout 을 초기화. 호출되지 않을 경우에는 keyup_delay 이후에 상태값을 저장
@@ -413,7 +413,7 @@ TMON.MEMO = (() => {
     function saveContents( evt ) {
         delay( saveStatus, keyup_delay );
     }
-    
+
     /**
      * 화면 상의 모든 메모를 제거
      */
@@ -426,45 +426,45 @@ TMON.MEMO = (() => {
         document.querySelectorAll( ".memo" ).forEach( memo => memo.remove() );
         saveStatus();
     }
-    
+
     /**
      * 화면상의 모든 메모를 좌측 상단 부터 정렬한다.
      * 정렬 시 모든 메모의 사이즈는 기본값으로 초기화 됨.
      */
     function sortMemo() {
-    
+
         let msg = "메모의 사이즈가 초기화 됩니다. 정렬하시겠습니까?";
         if ( !confirm( msg ) ) {
             return;
         }
-    
+
         let screenHeight = document.body.scrollHeight;
         let width = text_area_width + 20;
         let height = text_area_height + 36;
         let left = 0;
         let idx = 0;
         document.querySelectorAll( ".memo" ).forEach( memo => {
-            
+
             // 정렬을 위해 text_area 의 값을 기본값으로 초기화
             let text_area = memo.querySelector( "#text_area" );
             text_area.style.width = text_area_width + "px";
             text_area.style.height = text_area_height + "px";
-            
+
             // 한행에 놓이는 메모가 container 의 height 를 넘어갈 경우 다름 라인에 정렬
             if ( ( height * idx + height ) >= screenHeight ) {
                 left += width;
                 idx = 0;
             }
-    
+
             memo.style.top = ( height * idx ) + "px";
             memo.style.left =  left + "px";
-    
+
             idx++;
         });
-    
+
         saveStatus();
     }
-    
+
     /**
      * 선택한 메모를 제거
      */
@@ -472,7 +472,7 @@ TMON.MEMO = (() => {
         evt.target.parentElement.parentElement.remove();
         saveStatus();
     }
-    
+
     /**
      * 선택한 메모의 색상을 변경하는 레이어를 띄운다.
      */
@@ -500,7 +500,7 @@ TMON.MEMO = (() => {
                 });
             color_container.appendChild( c );
         });
-        
+
         evt.target.appendChild( color_container );
     }
 
@@ -512,10 +512,10 @@ TMON.MEMO = (() => {
         document.querySelectorAll( ".memo" ).forEach( ( el, idx ) => {
             if ( el.id === memo_id )
                 el.style.zIndex = `9999`;
-            else    
+            else
                 el.style.zIndex = `${idx}`;
         });
-    
+
         saveStatus();
     }
 
@@ -527,5 +527,5 @@ TMON.MEMO = (() => {
     };
 
     return o;
-    
+
 })();
